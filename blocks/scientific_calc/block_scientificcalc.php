@@ -19,78 +19,95 @@ class block_scientificcalc extends block_base {
         return <<<HTML
 <style>
 .calc-container {
-    margin-left: 1em;
-    padding: 12px;
-    border-radius: 8px;
-    background-color: #ffffff;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-    color: #000000;
-    max-width: 240px;
+    background-color: #a0aec0;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.calc-display #calc_screen {
-    margin-bottom: 0.8em;
-    width: 100%;
-    height: 50px;
+.calc-display input {
+    background-color: #ffffff;  
+    color: #000000; 
+    margin-bottom: 5px;            
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
     font-size: 20px;
-    text-align: right;
-    padding-right: 0.4em;
-    background: #f0f0f0;
-    color: #000000;
-    border: none;
-    border-radius: 6px;
-    box-shadow: inset 2px 2px 5px #ccc, inset -2px -2px 5px #fff;
+    width: 100%;
 }
 
 .calc-btns {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 6px;
+    gap: 8px;
 }
 
+/* Estilo base de botões */
 .calc-btns button {
-    height: 38px;
     font-size: 14px;
     border: none;
-    border-radius: 6px;
-    background: #f3f3f3;
+    border-radius: 10px;
+    background: #e0e0e0;
     color: #000;
-    box-shadow: 1px 1px 3px #ccc, -1px -1px 3px #fff;
+    box-shadow: 0 2px #999;
     transition: 0.2s;
     padding: 0;
+    font-weight: bold;
 }
 
-.calc-btns button:hover {
-    filter: brightness(90%);
+/* Primeiras 5 linhas - botões científicos e secundários */
+.calc-btns button:nth-child(-n+25) {
+    height: 28px;
+    font-size: 12px;
+    background: #2f3d4c;      /* azul acinzentado escuro */
+    color: #ffffff;
 }
 
-#calc-eval {
-    background: #00bfff;
+/* Botões principais (números e operadores) */
+.calc-btns button:nth-child(n+26) {
+    height: 42px;
+}
+
+/* Botões numéricos */
+.calc-btns button:where(:nth-child(n+26):nth-child(-n+35)),
+.calc-btns button:where(:nth-child(n+36):nth-child(-n+45)) {
+    background: #f8f9fa;      /* cinza claro */
+    color: #212529;
+}
+
+/* Botões de operação */
+button.operator {
+    background: #f8f9fa;      
+    color: #000;
+}
+
+/* Botão limpar */
+#calc-clear {
+    background: #dc3545;      /* vermelho vibrante */
     color: #fff;
 }
 
-#calc-eval:hover {
-    background: #009acd;
-}
-
-#calc-ac {
-    background: #00cc66;
+/* Botão backspace */
+#calc-back {
+    background: #dc3545;      
     color: #fff;
 }
 
-#calc-ac:hover {
-    background: #00994d;
-}
-
-#calc-ce {
-    background: #ff3399;
+/* Botões de memória */
+button:contains('M+') {
+    background: #17a2b8;      /* azul-petróleo */
     color: #fff;
 }
-
-#calc-ce:hover {
-    background: #cc0066;
+button:contains('M-'),
+button:contains('MR'),
+button:contains('MC'),
+button:contains('MS') {
+    background: #20c997;      /* verde água */
+    color: #fff;
 }
 </style>
+
+
 
 <div class="calc-container" id="calc-container">
     <div class="calc-display">
@@ -98,78 +115,238 @@ class block_scientificcalc extends block_base {
     </div>
 
     <div class="calc-btns">
-        <button onclick="pow()">x²</button>
+        <button onclick="sin()">sin</button>
+        <button onclick="cos()">cos</button>
+        <button onclick="tan()">tan</button>
+        <button onclick="addToScreen('(')">(</button>
+        <button onclick="addToScreen(')')">)</button>
+
+        <button onclick="setAngleMode('deg')">Deg</button>
+        <button onclick="setAngleMode('rad')">Rad</button>
         <button onclick="pi()">π</button>
         <button onclick="euler()">e</button>
-        <button id="calc-ac" onclick="calc_screen.value=''">C</button>
-        <button id="calc-ce" onclick="backspc()">⌫</button>
-
-        <button onclick="sqrt()">√</button>
-        <button>(</button>
-        <button>)</button>
         <button onclick="fact()">n!</button>
-        <button>/</button>
 
-        <button onclick="sin()">sin</button>
-        <button>7</button>
-        <button>8</button>
-        <button>9</button>
-        <button>*</button>
+        <button onclick="asin()">sin⁻¹</button>
+        <button onclick="acos()">cos⁻¹</button>
+        <button onclick="atan()">tan⁻¹</button>
+        <button onclick="recip()">1/x</button>
+        <button class="operator" onclick="addToScreen('%')">%</button>
 
-        <button onclick="cos()">cos</button>
-        <button>4</button>
-        <button>5</button>
-        <button>6</button>
-        <button>-</button>
+        <button onclick="powxy()">xʸ</button>
+        <button onclick="pow3()">x³</button>
+        <button onclick="pow()">x²</button>
+        <button onclick="exp()">eˣ</button>
+        <button onclick="pow10()">10ˣ</button>
 
-        <button onclick="tan()">tan</button>
-        <button>1</button>
-        <button>2</button>
-        <button>3</button>
-        <button>+</button>
-
+        <button onclick="rooty()">ʸ√x</button>
+        <button onclick="cbrt()">∛x</button>
+        <button onclick="sqrt()">√x</button>
+        <button onclick="ln()">ln</button>
         <button onclick="log()">log</button>
-        <button>0</button>
-        <button>.</button>
-        <button id="calc-eval" onclick="calc_screen.value=eval(calc_screen.value)">=</button>
+
+        <button onclick="addToScreen('7')">7</button>
+        <button onclick="addToScreen('8')">8</button>
+        <button onclick="addToScreen('9')">9</button>
+        <button id="calc-back" onclick="backspc()">DEL</button>
+        <button id="calc-clear" onclick="clearScreen()">C</button>
+
+        <button onclick="addToScreen('4')">4</button>
+        <button onclick="addToScreen('5')">5</button>
+        <button onclick="addToScreen('6')">6</button>
+        <button class="operator" onclick="addToScreen('*')">×</button>
+        <button class="operator" onclick="addToScreen('/')">÷</button>
+
+        <button onclick="addToScreen('1')">1</button>
+        <button onclick="addToScreen('2')">2</button>
+        <button onclick="addToScreen('3')">3</button>
+        <button class="operator" onclick="addToScreen('+')">+</button>
+        <button class="operator" onclick="addToScreen('-')">−</button>
+
+        <button onclick="addToScreen('0')">0</button>
+        <button onclick="addToScreen('.')">.</button>
+        <button onclick="expEntry()">EXP</button>
+        <button onclick="memoryAdd()">M+</button>
+        <button id="calc-eval" onclick="calculate()">=</button>
     </div>
 </div>
 
 <script>
-(function() {
-    const screen = document.querySelector("#calc_screen");
-    const botoes = document.querySelectorAll(".calc-btns button");
+const screen = document.querySelector("#calc_screen");
+let angleMode = "deg";
+let pendingOperation = null;
+let storedValue = null;
+let isResult = false;
 
-    botoes.forEach((botao) => {
-        botao.addEventListener("click", (e) => {
-            let btntext = e.target.innerText;
-            if (e.target.getAttribute("onclick")) return;
+// Modos de ângulo
+function setAngleMode(mode) {
+    angleMode = mode;
+    alert("Modo: " + mode.toUpperCase());
+}
 
-            if (btntext === "×") btntext = "*";
-            if (btntext === "÷") btntext = "/";
-            screen.value += btntext;
-        });
-    });
+const toRadians = x => angleMode === "deg" ? x * (Math.PI / 180) : x;
+const toDegrees = x => angleMode === "deg" ? x * (180 / Math.PI) : x;
 
-    window.sin = () => screen.value = Math.sin(screen.value);
-    window.cos = () => screen.value = Math.cos(screen.value);
-    window.tan = () => screen.value = Math.tan(screen.value);
-    window.pow = () => screen.value = Math.pow(screen.value, 2);
-    window.sqrt = () => screen.value = Math.sqrt(screen.value);
-    window.log = () => screen.value = Math.log(screen.value);
-    window.pi = () => screen.value += Math.PI;
-    window.euler = () => screen.value += 2.718281828459045;
-    window.fact = () => {
-        let num = Number(screen.value);
-        let f = 1;
-        for (let i = 1; i <= num; i++) f *= i;
-        screen.value = f;
-    };
-    window.backspc = () => screen.value = screen.value.slice(0, -1);
-})();
+// Entrada de tela
+function addToScreen(val) {
+    if (isResult) {
+        screen.value = "";
+        isResult = false;
+    }
+    screen.value += val;
+}
+
+function calculate() {
+    try {
+        if (pendingOperation && storedValue !== null) {
+            const currentValue = eval(screen.value);
+            switch (pendingOperation) {
+                case "powxy":
+                    screen.value = Math.pow(storedValue, currentValue);
+                    break;
+                case "rooty":
+                    screen.value = Math.pow(currentValue, 1 / storedValue);
+                    break;
+            }
+            pendingOperation = null;
+            storedValue = null;
+            isResult = true;
+            return;
+        }
+
+        screen.value = eval(screen.value);
+        isResult = true;
+    } catch {
+        screen.value = "Erro";
+        isResult = false;
+    }
+}
+
+
+function clearScreen() {
+    screen.value = "";
+    isResult = false;
+}
+
+function backspc() {
+    screen.value = screen.value.slice(0, -1);
+}
+
+// Funções matemáticas com arredondamento
+function sin() {
+    if (screen.value === "") return;
+    screen.value = parseFloat(Math.sin(toRadians(eval(screen.value))).toFixed(10));
+    isResult = true;
+}
+function cos() {
+    if (screen.value === "") return;
+    screen.value = parseFloat(Math.cos(toRadians(eval(screen.value))).toFixed(10));
+    isResult = true;
+}
+function tan() {
+    if (screen.value === "") return;
+    screen.value = parseFloat(Math.tan(toRadians(eval(screen.value))).toFixed(10));
+    isResult = true;
+}
+function asin() {
+    if (screen.value === "") return;
+    screen.value = parseFloat(toDegrees(Math.asin(eval(screen.value))).toFixed(10));
+    isResult = true;
+}
+function acos() {
+    if (screen.value === "") return;
+    screen.value = parseFloat(toDegrees(Math.acos(eval(screen.value))).toFixed(10));
+    isResult = true;
+}
+function atan() {
+    if (screen.value === "") return;
+    screen.value = parseFloat(toDegrees(Math.atan(eval(screen.value))).toFixed(10));
+    isResult = true;
+}
+
+function pow() {
+    if (screen.value === "") return;
+    screen.value = Math.pow(eval(screen.value), 2);
+    isResult = true;
+}
+function pow3() {
+    if (screen.value === "") return;
+    screen.value = Math.pow(eval(screen.value), 3);
+    isResult = true;
+}
+function powxy() {
+    storedValue = eval(screen.value);
+    pendingOperation = "powxy";
+    screen.value = "";
+}
+function sqrt() {
+    if (screen.value === "") return;
+    screen.value = Math.sqrt(eval(screen.value));
+    isResult = true;
+}
+function cbrt() {
+    if (screen.value === "") return;
+    screen.value = Math.cbrt(eval(screen.value));
+    isResult = true;
+}
+function rooty() {
+    storedValue = eval(screen.value);
+    pendingOperation = "rooty";
+    screen.value = "";
+}
+function log() {
+    if (screen.value === "") return;
+    screen.value = Math.log10(eval(screen.value));
+    isResult = true;
+}
+function ln() {
+    if (screen.value === "") return;
+    screen.value = Math.log(eval(screen.value));
+    isResult = true;
+}
+function pi() {
+    screen.value += Math.PI;
+}
+function euler() {
+    screen.value += Math.E;
+}
+function exp() {
+    if (screen.value === "") return;
+    screen.value = Math.exp(eval(screen.value));
+    isResult = true;
+}
+function pow10() {
+    if (screen.value === "") return;
+    screen.value = Math.pow(10, eval(screen.value));
+    isResult = true;
+}
+function recip() {
+    if (screen.value === "") return;
+    screen.value = 1 / eval(screen.value);
+    isResult = true;
+}
+function fact() {
+    if (screen.value === "") return;
+    let n = parseInt(eval(screen.value));
+    let f = 1;
+    for (let i = 2; i <= n; i++) f *= i;
+    screen.value = f;
+    isResult = true;
+}
+function expEntry() {
+    screen.value += "e";
+}
+
+// Memória
+let memory = 0;
+function memorySave() { memory = eval(screen.value); }
+function memoryRecall() { screen.value += memory; }
+function memoryAdd() { memory += eval(screen.value); }
+function memorySubtract() { memory -= eval(screen.value); }
+function memoryClear() { memory = 0; }
 </script>
 HTML;
-    }
+}
 
     public function applicable_formats() {
         return ['all' => true];
@@ -178,4 +355,4 @@ HTML;
     public function instance_allow_multiple() {
         return false;
     }
-}
+}   
